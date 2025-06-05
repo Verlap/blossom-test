@@ -21,6 +21,7 @@ export interface Character {
   episode: string[];
   url: string;
   created: string;
+  isStarred?: boolean;
 }
 
 export interface CharacterStrict {
