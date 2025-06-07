@@ -1,36 +1,147 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rick & Morty Characters App
 
-## Getting Started
+A modern web application built with Next.js and TypeScript that allows you to explore the Rick & Morty universe. Users can browse all characters, bookmark their favorites, and view detailed information for each one.
 
-First, run the development server:
+## 🚀 Live Demo
+
+**[View Live Application](https://rick-and-morty-bqm6.vercel.app/)**
+
+## 📋 Features
+
+- **Character Exploration**: Browse all Rick & Morty characters using the official API
+- **Favorites System**: Mark and unmark characters as favorites with local persistence
+- **Detailed View**: Check complete information for each character on individual pages
+- **Responsive Design**: Interface optimized for mobile and desktop devices
+- **Context API**: Efficient global state management
+- **Atomic Design Architecture**: Components organized following atomic design principles
+
+## 🛠️ Technologies Used
+
+- **[Next.js 15.3.3](https://nextjs.org/)** - React framework for production
+- **[React 19](https://reactjs.org/)** - JavaScript library for user interfaces
+- **[TypeScript 5](https://www.typescriptlang.org/)** - Typed superset of JavaScript
+- **[Tailwind CSS 4.1.8](https://tailwindcss.com/)** - Utility-first CSS framework
+- **[Lucide React](https://lucide.dev/)** - Icon library
+- **[Rick and Morty API](https://rickandmortyapi.com/)** - Public REST API
+
+## ⚙️ Prerequisites
+
+Make sure you have installed on your system:
+
+- **Node.js** (version 18 or higher)
+- **npm** (comes included with Node.js)
+
+## 🚀 Installation and Setup
+
+### 1. Clone the repository
+
+```bash
+git clone <repository-url>
+cd rick-morty-app
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Run in development mode
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will be available at `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📜 Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Development with Turbopack (faster)
+npm run dev
 
-## Learn More
+# Build for production
+npm run build
 
-To learn more about Next.js, take a look at the following resources:
+# Run in production mode
+npm run start
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Linter to review code
+npm run lint
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📁 Project Structure
 
-## Deploy on Vercel
+```
+rick-and-morty/
+├── public/                     # Static files
+├── src/
+│   └── app/
+│       ├── components/         # Components organized by Atomic Design
+│       │   ├── atoms/         # Basic components
+│       │   ├── molecules/     # Compound components
+│       │   ├── organisms/     # Complex components
+│       │   │   ├── aside/     # Character sidebar list
+│       │   │   └── search-filter/
+│       │   └── templates/     # Page templates
+│       │       └── MainLayout.tsx
+│       ├── contexts/          # Context API
+│       │   └── characterContext.tsx
+│       ├── pages/             # Application pages
+│       │   ├── character/     # Character detail page
+│       │   │   └── [id].tsx
+│       │   └── index.tsx
+│       ├── services/          # API services
+│       │   └── characterService.ts
+│       └── types/             # TypeScript definitions
+│           └── characters.ts
+├── package.json
+└── README.md
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎯 Main Features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Context API for State Management
+
+The application uses React Context to handle:
+- List of all characters
+- Characters marked as favorites
+- Currently selected character
+- Loading and error states
+
+### Favorites System
+
+- **Mark/Unmark**: Each character has a button to add or remove it from favorites
+- **Persistence**: Favorites are saved in browser's localStorage
+- **Organization**: Favorite characters appear in a separate section in the list
+
+### Navigation
+
+- **Sidebar**: Sidebar with all characters organized by favorites and regular ones
+- **Detail View**: Individual page for each character with complete information
+- **Dynamic Routing**: Friendly URLs like `/character/1`
+
+## 🔧 Additional Configuration
+
+### Environment Variables
+
+The project doesn't require additional environment variables as it uses the public Rick & Morty API.
+
+### Customization
+
+To customize styles, modify the Tailwind CSS files in the project configuration.
+
+## 📱 Responsive Design
+
+The application is optimized for:
+- 📱 **Mobile**: Adaptive design for small screens
+- 🖥️ **Desktop**: Takes advantage of available space on large screens
+
+## 🙏 Acknowledgments
+
+- [Rick and Morty API](https://rickandmortyapi.com/) for providing the free API
+- Next.js and React community for the incredible tools
+
+---
+
+**Developed with ❤️ using Next.js and TypeScript**
