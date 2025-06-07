@@ -7,7 +7,7 @@ import CharacterItem from "@/app/components/molecules/characterItem/component";
 import SearchFilter, {
   FilterState,
 } from "@/app/components/organisms/searchFilter/component";
-import { Character, HasMoreCharacters } from "@/app/types/character";
+import { Character} from "@/app/types/character";
 
 const Component = () => {
   const router = useRouter();
@@ -66,7 +66,7 @@ const Component = () => {
 
   return (
     <aside className="xl:w-1/4 md:w-1/3 w-screen h-[calc(100vh-24px)] bg-white overflow-hidden relative">
-      <div className="h-1/5">
+      <div className="h-1/5 !mb-4">
         <h2 className="leading-8 text-2xl font-normal text-text p-6">
           Rick and Morty list
         </h2>
@@ -75,9 +75,8 @@ const Component = () => {
           currentFilters={filters}
         />
       </div>
-
       <nav
-        className="flex flex-col gap-4 px-6 max-h-4/5  overflow-y-auto"
+        className="flex flex-col gap-4 px-6 max-h-4/5 pb-8 overflow-y-auto"
         aria-label="Character list"
       >
         <ul className="list-none space-y-2">

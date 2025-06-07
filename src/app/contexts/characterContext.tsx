@@ -7,9 +7,10 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import { Character, HasMoreCharacters } from "@/app/types/character";
+import { Character, CharacterResponse, HasMoreCharacters } from "@/app/types/character";
 import characterService from "@/app/services/characterService";
 import { stringify } from "querystring";
+import { count } from "console";
 
 export interface FilterState {
   searchTerm: string;
@@ -46,6 +47,7 @@ const initialState: CharacterState = {
   hasMoreCharacters: {
     nextPage: 1,
     hasMore: false,
+    count: 0,
   },
   filters: {
     searchTerm: "",
@@ -292,7 +294,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       let page = 1;
       let hasNextPage = true;
 
-      const response = await characterService.getCharacters(page);
+      const response:CharacterResponse = await characterService.getCharacters(page);
       hasNextPage = response.info.next !== null;
 
       dispatch({ type: "SET_CHARACTERS", payload: response.results });
@@ -300,6 +302,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
         const hasMoreCharacters = {
           hasMore: hasNextPage,
           nextPage: (page += 1),
+          count: response.info.count,
         };
         dispatch({ type: "LOAD_MORE_CHARACTERS", payload: hasMoreCharacters });
       }
@@ -318,7 +321,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       const moreCharacters = state.hasMoreCharacters;
       if (moreCharacters.hasMore) {
         console.log(moreCharacters);
-        const response = await characterService.getCharacters(
+        const response:CharacterResponse = await characterService.getCharacters(
           moreCharacters.nextPage
         );
         dispatch({ type: "SET_CHARACTERS", payload: response.results });
@@ -328,6 +331,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
           const hasMoreCharacters = {
             hasMore: hasNextPage,
             nextPage: (moreCharacters.nextPage += 1),
+            count: response.info.count
           };
           dispatch({
             type: "LOAD_MORE_CHARACTERS",

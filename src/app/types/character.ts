@@ -52,4 +52,5 @@ export interface CharacterResponse {
 export interface HasMoreCharacters{
   nextPage: number;
   hasMore: boolean;
+  count: number;
 }
