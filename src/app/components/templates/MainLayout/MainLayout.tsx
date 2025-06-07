@@ -8,7 +8,7 @@ interface MainLayoutProps {
   children: ReactNode;
 }
 
-export const MainLayout = ({ children }: MainLayoutProps) => {
+export default function MainLayout({ children }: MainLayoutProps) {
   const { state } = useCharacters();
   const { selectedCharacter } = state;
 
