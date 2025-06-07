@@ -8,7 +8,7 @@ interface MainLayoutProps {
   children: ReactNode;
 }
 
-const MainLayout = ({ children }: MainLayoutProps) => {
+export const MainLayout = ({ children }: MainLayoutProps) => {
   const { state } = useCharacters();
   const { selectedCharacter } = state;
 
@@ -24,5 +24,3 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     </div>
   );
 }
-
-export default MainLayout;

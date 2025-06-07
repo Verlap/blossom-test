@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { CharacterProvider } from "@/app/contexts/characterContext";
-import MainLayout from "@/app/components/templates/mainLayout/mainLayout";
+import { MainLayout } from "@/app/components/templates/mainLayout/mainLayout";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -24,9 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`antialiased ${montserrat.className}`}>
         <CharacterProvider>
-          <MainLayout>
-            {children}
-          </MainLayout>
+          <MainLayout>{children}</MainLayout>
         </CharacterProvider>
       </body>
     </html>
