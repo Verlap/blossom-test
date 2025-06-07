@@ -20,7 +20,7 @@ const Component = () => {
     setFilters,
   } = useCharacters();
 
-  const { selectedCharacter, hasMoreCharacters, loading, error, filters } =
+  const { hasMoreCharacters, loading, error, filters } =
     state;
 
   useEffect(() => {

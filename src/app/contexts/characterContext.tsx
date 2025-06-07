@@ -9,8 +9,6 @@ import React, {
 } from "react";
 import { Character, CharacterResponse, HasMoreCharacters } from "@/app/types/character";
 import characterService from "@/app/services/characterService";
-import { stringify } from "querystring";
-import { count } from "console";
 
 export interface FilterState {
   searchTerm: string;
