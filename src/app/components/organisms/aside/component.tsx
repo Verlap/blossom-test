@@ -1,62 +1,59 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import { useCharacters } from "@/app/contexts/characterContexts";
-import characterService from "@/app/services/characterService";
+import { useCharacters } from "@/app/contexts/characterContext";
 import CharacterItem from "@/app/components/molecules/characterItem/component";
-import { Character, CharacterResponse } from "@/app/types/character";
+import SearchFilter, {
+  FilterState,
+} from "@/app/components/organisms/searchFilter/component";
+import { Character, HasMoreCharacters } from "@/app/types/character";
 
 const Component = () => {
   const router = useRouter();
-  const [page, setPage] = useState(1);
+  const {
+    state,
+    dispatch,
+    fetchCharacters,
+    fetchMoreCharacters,
+    getFilteredCharacters,
+    setFilters,
+  } = useCharacters();
 
-  const { state, dispatch } = useCharacters();
-  const { characters, starredCharacters, loading, error } = state;
+  const { selectedCharacter, hasMoreCharacters, loading, error, filters } =
+    state;
 
   useEffect(() => {
-    fetchCharacters(page);
-  }, [page]);
-
-  const fetchCharacters = async (page: number) => {
-    try {
-      dispatch({ type: "SET_LOADING", payload: true });
-      const response: CharacterResponse = await characterService.getCharacters(page);
-      
-      if (response) {
-        dispatch({ type: "SET_CHARACTERS", payload: response.results });
-        dispatch({ type: "SET_ERROR", payload: null });
-      }
-    } catch (error: any) {
-      dispatch({ type: "SET_ERROR", payload: error.message });
-    } finally {
-      dispatch({ type: "SET_LOADING", payload: false });
+    if (state.characters.length === 0) {
+      fetchCharacters();
     }
-  };
+  }, []);
 
-  // Separar personajes en starred y no-starred para mejor organización
-  const { starredList, regularList } = useMemo(() => {
-    const starredIds = new Set(starredCharacters.map((char) => char.id));
-    
-    return {
-      starredList: starredCharacters,
-      regularList: characters.filter((character) => !starredIds.has(character.id))
-    };
-  }, [characters, starredCharacters]);
+  const { starredList, regularList } = getFilteredCharacters();
 
   const handleCharacterSelect = (character: Character) => {
     dispatch({ type: "SET_SELECTED_CHARACTER", payload: character });
     router.push(`/character/${character.id}`);
   };
 
+  const handleFilterChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+  };
+
+  const handleShowMore = () => {
+    fetchMoreCharacters();
+  };
+
   if (error) {
     return (
-      <aside className="xl:w-1/4 md:w-1/3 w-screen h-[calc(100vh-24px)] bg-white">
+      <aside
+        className={`xl:w-1/4 md:w-1/3 w-screen h-[calc(100vh-24px)] bg-white`}
+      >
         <div className="p-6">
           <div className="text-red-500 text-center">
             <p>Error: {error}</p>
-            <button 
-              onClick={() => fetchCharacters(page)}
+            <button
+              onClick={() => fetchCharacters()}
               className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
             >
               Try Again
@@ -68,77 +65,126 @@ const Component = () => {
   }
 
   return (
-    <aside className="xl:w-1/4 md:w-1/3 w-screen h-[calc(100vh-24px)] bg-white">
-      <div className="p-6 border-b border-gray-100">
-        <h2 className="leading-8 text-2xl font-normal text-text">
+    <aside className="xl:w-1/4 md:w-1/3 w-screen h-[calc(100vh-24px)] bg-white overflow-hidden relative">
+      <div className="h-1/5">
+        <h2 className="leading-8 text-2xl font-normal text-text p-6">
           Rick and Morty list
         </h2>
+        <SearchFilter
+          onFilterChange={handleFilterChange}
+          currentFilters={filters}
+        />
       </div>
 
-      <div className="flex flex-col gap-4 px-6 max-h-[calc(100vh-104px)] overflow-y-auto">
+      <nav
+        className="flex flex-col gap-4 px-6 max-h-4/5  overflow-y-auto"
+        aria-label="Character list"
+      >
         <ul className="list-none space-y-2">
           {starredList.length > 0 && (
             <>
-              <li className="sticky top-0 bg-white py-2">
+              <li className="sticky top-0 bg-white py-2 z-3">
                 <span className="text-gray-500 text-xs leading-4 font-semibold tracking-wider uppercase">
                   Starred Characters ({starredList.length})
                 </span>
               </li>
               {starredList.map((character) => (
-                <li key={`starred-${character.id}`}>
+                <li
+                  key={`starred-${character.id}`}
+                  className="border-t border-gray-300"
+                >
                   <CharacterItem
                     character={character}
-                    handleCharacterSelect={() => handleCharacterSelect(character)}
+                    handleCharacterSelect={() =>
+                      handleCharacterSelect(character)
+                    }
                   />
                 </li>
               ))}
-              
-              {/* Separator */}
-              <li className="py-2">
-                <hr className="border-gray-200" />
-              </li>
             </>
           )}
 
-          {/* Regular Characters Section */}
-          <li className="sticky top-0 bg-white py-2">
-            <span className="text-gray-500 text-xs leading-4 font-semibold tracking-wider uppercase">
-              Characters ({regularList.length})
-            </span>
-          </li>
-          
-          {regularList.length > 0 ? (
-            regularList.map((character) => (
-              <li key={`character-${character.id}`}>
-                <CharacterItem
-                  character={character}
-                  handleCharacterSelect={() => handleCharacterSelect(character)}
-                />
+          {filters.characterType !== "starred" && (
+            <>
+              <li className="sticky top-0 bg-white py-2 z-3">
+                <span className="text-gray-500 text-xs leading-4 font-semibold tracking-wider uppercase">
+                  Characters ({regularList.length})
+                </span>
               </li>
-            ))
-          ) : (
-            !loading && (
-              <li className="text-center text-gray-500 py-4">
-                {starredList.length > 0 
-                  ? "All Characters are starred"
-                  : "No characters available"
-                }
-              </li>
-            )
+
+              {regularList.length > 0
+                ? regularList.map((character) => (
+                    <li
+                      key={`character-${character.id}`}
+                      className="border-t border-gray-300"
+                    >
+                      <CharacterItem
+                        character={character}
+                        handleCharacterSelect={() =>
+                          handleCharacterSelect(character)
+                        }
+                      />
+                    </li>
+                  ))
+                : ""}
+            </>
+          )}
+
+          {starredList.length === 0 && regularList.length === 0 && !loading && (
+            <li className="text-center text-gray-500 py-8">
+              <div className="flex flex-col items-center space-y-2">
+                <p className="text-lg font-medium">No characters found</p>
+                <p className="text-sm">{getNoResultsMessage(filters)}</p>
+              </div>
+            </li>
+          )}
+          {loading && (
+            <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+              <div className="flex items-center justify-center space-x-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <span className="text-gray-500 text-sm">
+                  Loading Characters...
+                </span>
+              </div>
+            </div>
+          )}
+          { starredList.length === 0 && regularList.length === 0 || hasMoreCharacters.hasMore && (
+            <button
+              onClick={() => handleShowMore()}
+              disabled={loading}
+              className=" w-full !mt-6 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors"
+            >
+              Show More
+            </button>
           )}
         </ul>
-      </div>
-
-      {loading && (
-        <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
-          <div className="flex items-center justify-center space-x-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-            <span className="text-gray-500 text-sm">Loading Character...</span>
-          </div>
-        </div>
-      )}
+      </nav>
     </aside>
   );
+};
+
+const getNoResultsMessage = (filters: FilterState): string => {
+  const hasSearchTerm = filters.searchTerm.trim() !== "";
+  const hasSpeciesFilter = filters.species !== "all";
+  const hasTypeFilter = filters.characterType !== "all";
+
+  if (hasSearchTerm && hasSpeciesFilter && hasTypeFilter) {
+    return `No ${filters.characterType} ${filters.species} characters found matching "${filters.searchTerm}"`;
+  } else if (hasSearchTerm && hasSpeciesFilter) {
+    return `No ${filters.species} characters found matching "${filters.searchTerm}"`;
+  } else if (hasSearchTerm && hasTypeFilter) {
+    return `No ${filters.characterType} characters found matching "${filters.searchTerm}"`;
+  } else if (hasSearchTerm) {
+    return `No characters found matching "${filters.searchTerm}"`;
+  } else if (hasSpeciesFilter && hasTypeFilter) {
+    return `No ${filters.characterType} ${filters.species} characters available`;
+  } else if (hasSpeciesFilter) {
+    return `No ${filters.species} characters available`;
+  } else if (hasTypeFilter) {
+    return `No ${filters.characterType} characters available`;
+  } else {
+    return "No characters available";
+  }
 };
 
 export default Component;

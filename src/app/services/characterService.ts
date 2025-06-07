@@ -8,7 +8,7 @@ const getCharacters = async (page: number) => {
   return response.json();
 }
 
-const getCharactersById = async (id: number) => {
+const getCharactersById = async (id: string) => {
   console.log(`Fetching character with id: ${id}`);
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/character/${id}`);
   if (!response.ok) {

@@ -49,10 +49,7 @@ export interface CharacterResponse {
   results: Character[];
 }
 
-export interface CharacterFilters {
-  name?: string;
-  status?: 'alive' | 'dead' | 'unknown';
-  species?: string;
-  type?: string;
-  gender?: 'female' | 'male' | 'genderless' | 'unknown';
+export interface HasMoreCharacters{
+  nextPage: number;
+  hasMore: boolean;
 }

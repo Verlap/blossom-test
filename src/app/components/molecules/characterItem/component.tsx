@@ -1,7 +1,7 @@
 import React from "react";
 import BookMark from "@/app/components/atoms/bookmark/component";
 
-import { useCharacters } from "@/app/contexts/characterContexts";
+import { useCharacters } from "@/app/contexts/characterContext";
 import { Character } from "@/app/types/character";
 
 interface CharacterItemProps {

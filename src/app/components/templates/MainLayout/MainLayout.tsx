@@ -1,7 +1,7 @@
 "use client";
 import React, { ReactNode } from "react";
 
-import { useCharacters } from "@/app/contexts/characterContexts";
+import { useCharacters } from "@/app/contexts/characterContext";
 import Aside from "@/app/components/organisms/aside/component";
 
 interface MainLayoutProps {
@@ -14,9 +14,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="min-h-screen">
-      <div className="flex h-full bg-white">
+      <div className="flex h-full h-full bg-white">
         <Aside />
-        <main className={`bg-white shadow-main xl:w-3/4 md:w-2/3 w-screen h-screen md:relative absolute md:py-[40px] md:px-[100px] md:block ${selectedCharacter ? "block" : "hidden"}`}>
+        <main className={`bg-white shadow-main xl:w-3/4 md:w-2/3 w-screen h-[calc(100vh-24px)] md:relative absolute md:py-[40px] md:px-[100px] md:block ${selectedCharacter ? "block" : "hidden"}`}>
           {children}
         </main>
       </div>

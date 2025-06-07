@@ -28,9 +28,9 @@ const Component = ({
         p-2 rounded-full
         transition-all duration-200 ease-in-out
         hover:scale-110 
-        focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50
+        focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 bg-white hover:bg-white
         ${isStarred 
-          ? "bg-white text-secondary-600 hover:bg-green-50" 
+          ? "text-secondary-600 hover:bg-green-50" 
           : "text-slate-300 hover:text-green-400 hover:bg-slate-400/20"
         }
         ${className}
