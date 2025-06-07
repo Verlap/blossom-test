@@ -14,7 +14,6 @@ export default function CharacterPage() {
   const params = useParams();
   const { state, dispatch } = useCharacters();
   const { selectedCharacter } = state;
-
   useEffect(() => {
     if (!params.id) {
       router.push("/");
@@ -22,6 +21,23 @@ export default function CharacterPage() {
     }
     getCharacter();
   }, [params.id, state.characters, dispatch, router]);
+
+ useEffect(() => {
+    return () => {
+      dispatch({ type: "SET_SELECTED_CHARACTER", payload: null });
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      dispatch({ type: "SET_SELECTED_CHARACTER", payload: null });
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [dispatch, selectedCharacter?.id]);
 
   const getCharacter = async () => {
       const character = state.characters.find(
