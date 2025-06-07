@@ -7,15 +7,21 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import { Character, CharacterResponse, HasMoreCharacters } from "@/app/types/character";
+import {
+  Character,
+  CharacterResponse,
+  HasMoreCharacters,
+} from "@/app/types/character";
 import characterService from "@/app/services/characterService";
 
+/* Type for filter context states */
 export interface FilterState {
   searchTerm: string;
   characterType: "all" | "starred" | "regular";
   species: "all" | "human" | "alien";
 }
 
+/* Type for character context states */
 interface CharacterState {
   characters: Character[];
   starredCharacters: Character[];
@@ -26,6 +32,7 @@ interface CharacterState {
   filters: FilterState;
 }
 
+/* Type for character context actions */
 type CharacterAction =
   | { type: "SET_CHARACTERS"; payload: Character[] }
   | { type: "SET_SELECTED_CHARACTER"; payload: Character | null }
@@ -54,11 +61,13 @@ const initialState: CharacterState = {
   },
 };
 
+/* Reducer for all actions used in app */
 function characterReducer(
   state: CharacterState,
   action: CharacterAction
 ): CharacterState {
   switch (action.type) {
+    /* set all characters without deleting previous ones */
     case "SET_CHARACTERS":
       return {
         ...state,
@@ -66,12 +75,14 @@ function characterReducer(
         loading: false,
       };
 
+    /* set only character selected in aside */
     case "SET_SELECTED_CHARACTER":
       return {
         ...state,
         selectedCharacter: action.payload,
       };
 
+    /* toggle for starred characters */
     case "TOGGLE_STARRED":
       const characterId = action.payload;
       const isStarred = state.starredCharacters.some(
@@ -81,10 +92,12 @@ function characterReducer(
       let updatedStarredCharacters: Character[];
 
       if (isStarred) {
+        /* if the character is starred, then it is removed  */
         updatedStarredCharacters = state.starredCharacters.filter(
           (character) => character.id !== characterId
         );
       } else {
+        /* if characters is NOT starred, we find the object with exact id in all characters and then hte add to starred array */
         const characterToAdd = state.characters.find(
           (character) => character.id === characterId
         );
@@ -98,6 +111,7 @@ function characterReducer(
         }
       }
 
+      /* update the localStorage with current starred characters */
       localStorage.setItem(
         "starredCharacters",
         JSON.stringify(updatedStarredCharacters)
@@ -108,18 +122,21 @@ function characterReducer(
         starredCharacters: updatedStarredCharacters,
       };
 
+    /* load all starred characters from localStorage */
     case "LOAD_STARRED_FROM_STORAGE":
       return {
         ...state,
         starredCharacters: action.payload,
       };
 
+    /* It's used for loading status in app */
     case "SET_LOADING":
       return {
         ...state,
         loading: action.payload,
       };
 
+    /* It's used for set errors in app */
     case "SET_ERROR":
       return {
         ...state,
@@ -127,12 +144,14 @@ function characterReducer(
         loading: false,
       };
 
+    /* set filters for filter characters (by name, type and specie) */
     case "SET_FILTERS":
       return {
         ...state,
         filters: action.payload,
       };
 
+    /* load more characters (next pages in api) */
     case "LOAD_MORE_CHARACTERS":
       return {
         ...state,
@@ -144,6 +163,7 @@ function characterReducer(
   }
 }
 
+/* Type for Character Context */
 interface CharacterContextType {
   state: CharacterState;
   dispatch: React.Dispatch<CharacterAction>;
@@ -160,11 +180,14 @@ interface CharacterContextType {
   setFilters: (filters: FilterState) => void;
 }
 
+/* Create the Context */
 const CharacterContext = createContext<CharacterContextType | null>(null);
 
+/* Create the provider */
 export function CharacterProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(characterReducer, initialState);
 
+  /* load characters from localStorage and then use dispatch to store them (if there are starred characters in localstrage) */
   useEffect(() => {
     try {
       const saved = localStorage.getItem("starredCharacters");
@@ -183,24 +206,30 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  /* function for toggle starred action */
   const toggleStarred = (characterId: number) => {
     dispatch({ type: "TOGGLE_STARRED", payload: characterId });
   };
 
+  /* function to compare if character is already starred */
   const isStarred = (characterId: number): boolean => {
     return state.starredCharacters.some(
       (character) => character.id === characterId
     );
   };
 
+  /* function to get starred characters */
   const getStarredCharacters = (): Character[] => {
     return state.starredCharacters;
   };
 
+  /* function to set filters */
   const setFilters = (filters: FilterState) => {
     dispatch({ type: "SET_FILTERS", payload: filters });
   };
 
+
+  /* filter characters by name */
   const filterCharactersBySearch = (
     characters: Character[],
     searchTerm: string
@@ -216,6 +245,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  /* filter characters by species */
   const filterCharactersBySpecies = (
     characters: Character[],
     species: "all" | "human" | "alien"
@@ -233,6 +263,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  /* filter character by all values */
   const getFilteredCharacters = () => {
     const { searchTerm, characterType, species } = state.filters;
 
@@ -284,6 +315,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     return { starredList, regularList };
   };
 
+  /* get all characters (1 page) */
   const fetchCharacters = async (): Promise<void> => {
     dispatch({ type: "SET_LOADING", payload: true });
     dispatch({ type: "SET_ERROR", payload: null });
@@ -292,7 +324,9 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       let page = 1;
       let hasNextPage = true;
 
-      const response:CharacterResponse = await characterService.getCharacters(page);
+      const response: CharacterResponse = await characterService.getCharacters(
+        page
+      );
       hasNextPage = response.info.next !== null;
 
       dispatch({ type: "SET_CHARACTERS", payload: response.results });
@@ -311,6 +345,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  /* get more characters (> 1 page) */
   const fetchMoreCharacters = async (): Promise<void> => {
     dispatch({ type: "SET_LOADING", payload: true });
     dispatch({ type: "SET_ERROR", payload: null });
@@ -319,9 +354,8 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
       const moreCharacters = state.hasMoreCharacters;
       if (moreCharacters.hasMore) {
         console.log(moreCharacters);
-        const response:CharacterResponse = await characterService.getCharacters(
-          moreCharacters.nextPage
-        );
+        const response: CharacterResponse =
+          await characterService.getCharacters(moreCharacters.nextPage);
         dispatch({ type: "SET_CHARACTERS", payload: response.results });
 
         hasNextPage = response.info.next !== null;
@@ -329,7 +363,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
           const hasMoreCharacters = {
             hasMore: hasNextPage,
             nextPage: (moreCharacters.nextPage += 1),
-            count: response.info.count
+            count: response.info.count,
           };
           dispatch({
             type: "LOAD_MORE_CHARACTERS",
@@ -350,6 +384,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  /* get character by id */
   const fetchCharacterById = async (id: number): Promise<void> => {
     dispatch({ type: "SET_LOADING", payload: true });
     dispatch({ type: "SET_ERROR", payload: null });

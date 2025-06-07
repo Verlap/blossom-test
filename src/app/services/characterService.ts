@@ -1,5 +1,5 @@
 
-
+/* fetch all characters */
 const getCharacters = async (page: number) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/character/?page=${page}`);
   if (!response.ok) {
@@ -8,6 +8,7 @@ const getCharacters = async (page: number) => {
   return response.json();
 }
 
+/* fetch characters by id */
 const getCharactersById = async (id: string) => {
   console.log(`Fetching character with id: ${id}`);
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/character/${id}`);
@@ -17,6 +18,7 @@ const getCharactersById = async (id: string) => {
   return response.json();
 }
 
+/* export all functions */
 const characterService = {
   getCharacters,
   getCharactersById,

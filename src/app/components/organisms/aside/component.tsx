@@ -23,6 +23,7 @@ const Component = () => {
   const { hasMoreCharacters, loading, error, filters } =
     state;
 
+    /* fetch initial characters (ojnly for 1 page of characters) */
   useEffect(() => {
     if (state.characters.length === 0) {
       fetchCharacters();
@@ -31,15 +32,18 @@ const Component = () => {
 
   const { starredList, regularList } = getFilteredCharacters();
 
+  /* function to handle character selection in aside menu */
   const handleCharacterSelect = (character: Character) => {
     dispatch({ type: "SET_SELECTED_CHARACTER", payload: character });
     router.push(`/character/${character.id}`);
   };
 
+  /* function to handle filter values in state */
   const handleFilterChange = (newFilters: FilterState) => {
     setFilters(newFilters);
   };
 
+  /* function to load more characters from API */
   const handleShowMore = () => {
     fetchMoreCharacters();
   };
@@ -162,6 +166,7 @@ const Component = () => {
   );
 };
 
+/* all responses for possible searchs with no results */
 const getNoResultsMessage = (filters: FilterState): string => {
   const hasSearchTerm = filters.searchTerm.trim() !== "";
   const hasSpeciesFilter = filters.species !== "all";

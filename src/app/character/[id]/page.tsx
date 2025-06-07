@@ -14,55 +14,65 @@ export default function CharacterPage() {
   const params = useParams();
   const { state, dispatch } = useCharacters();
   const { selectedCharacter } = state;
+
   useEffect(() => {
+    /* if there is not id in url, return to main page */
     if (!params.id) {
       router.push("/");
       return;
     }
+
     getCharacter();
   }, [params.id, state.characters, dispatch, router]);
 
- useEffect(() => {
+  /* clean state when component dismount */
+  useEffect(() => {
     return () => {
       dispatch({ type: "SET_SELECTED_CHARACTER", payload: null });
     };
   }, [dispatch]);
 
+  /* detect when user uses back navigation button to clean state */
   useEffect(() => {
     const handleBeforeUnload = () => {
       dispatch({ type: "SET_SELECTED_CHARACTER", payload: null });
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [dispatch, selectedCharacter?.id]);
 
+  /* fucntion to get character*/
   const getCharacter = async () => {
-      const character = state.characters.find(
-        (char) => char.id === parseInt(String(params.id))
-      );
-      if (character) {
-        dispatch({ type: "SET_SELECTED_CHARACTER", payload: character });
-      } else {
-        try{
-          const response:Character = await characterService.getCharactersById(String(params.id));
-          if (response) {
-            dispatch({ type: "SET_SELECTED_CHARACTER", payload:  response });
-          } else {
-            dispatch({ type: "SET_SELECTED_CHARACTER", payload: null });
-            router.push("/");
-          }
-        }
-        catch (error: any) {
-          console.error("Error fetching character:", error);
+    const character = state.characters.find(
+      (char) => char.id === parseInt(String(params.id))
+    );
+    if (character) {
+      /* if character is in characters state, just save in character state */
+      dispatch({ type: "SET_SELECTED_CHARACTER", payload: character });
+    } else {
+      /* if character does NOT exist in characters state, use service to get information about character and then save in state*/
+      try {
+        const response: Character = await characterService.getCharactersById(
+          String(params.id)
+        );
+        if (response) {
+          dispatch({ type: "SET_SELECTED_CHARACTER", payload: response });
+        } else {
           dispatch({ type: "SET_SELECTED_CHARACTER", payload: null });
           router.push("/");
         }
+      } catch (error: any) {
+        console.error("Error fetching character:", error);
+        dispatch({ type: "SET_SELECTED_CHARACTER", payload: null });
+        router.push("/");
       }
     }
+  };
 
+  /* handle back button action (only for mobile view) */
   const handleBack = () => {
     dispatch({ type: "SET_SELECTED_CHARACTER", payload: null });
     router.push("/");
@@ -73,7 +83,7 @@ export default function CharacterPage() {
       {selectedCharacter ? (
         <>
           <div className="md:hidden flex p-4">
-            <BackButton onBack={()=> handleBack()} />
+            <BackButton onBack={() => handleBack()} />
           </div>
           <CharacterHeader {...selectedCharacter} />
           <div>
